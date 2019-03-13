@@ -3,11 +3,11 @@ from jsonfield import JSONField
 
 # Create your models here.
 class Twitter_User(models.Model):
-	t_id = models.BigIntegerField(default=0)
+	t_id = models.CharField(max_length=60)
 	t_screen_name = models.CharField(max_length=20)
 	t_user_name = models.CharField(max_length=60)
-	t_user_location = models.CharField(max_length=240, blank=True)
-	t_user_description = models.TextField(blank=True)
+	t_user_location = models.CharField(max_length=240, blank=True, null=True)
+	t_user_description = models.TextField(blank=True, null=True)
 
 	def __str__(self):
 		return self.t_user_name
@@ -15,7 +15,7 @@ class Twitter_User(models.Model):
 
 class Tweet(models.Model):
 	tweet_created_at = models.CharField(max_length=60, blank=True)
-	tweet_id = models.BigIntegerField(default=0)
+	tweet_id = models.CharField(max_length=60)
 	tweet_text = models.TextField()
 	tweet_user = models.CharField(max_length=60)
 	tweet_longitude = models.FloatField(blank=True, null=True)
@@ -25,6 +25,7 @@ class Tweet(models.Model):
 	tweet_media = JSONField(blank=True)
 	tweet_hashtags = JSONField(blank=True)
 	tweet_possibly_sensitive = models.BooleanField(default=False, blank=True)
+	tweet_score = models.FloatField(blank=True, null=True)
 
 	def __str__(self):
 		return self.tweet_text
