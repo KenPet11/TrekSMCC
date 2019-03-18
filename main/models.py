@@ -15,17 +15,22 @@ class Twitter_User(models.Model):
 
 class Tweet(models.Model):
 	tweet_created_at = models.CharField(max_length=60, blank=True)
+	tweet_year = models.IntegerField(blank=True, null=True)
+	tweet_month = models.IntegerField(blank=True, null=True)
+	tweet_day = models.IntegerField(blank=True, null=True)
 	tweet_id = models.CharField(max_length=60)
 	tweet_text = models.TextField()
 	tweet_user = models.CharField(max_length=60)
-	tweet_longitude = models.FloatField(blank=True, null=True)
-	tweet_latitude = models.FloatField(blank=True, null=True)
-	tweet_place = JSONField(blank=True)
+	tweet_longitude = models.FloatField(blank=True, null=True, default=None)
+	tweet_latitude = models.FloatField(blank=True, null=True, default=None)
+	tweet_place = JSONField(blank=True, default=None)
 	tweet_retweeted_status = models.BooleanField(default=False, blank=True)
 	tweet_media = JSONField(blank=True)
 	tweet_hashtags = JSONField(blank=True)
 	tweet_possibly_sensitive = models.BooleanField(default=False, blank=True)
 	tweet_score = models.FloatField(blank=True, null=True)
+	tweet_user_user_name = models.CharField(max_length=60, default='')
+	tweet_user_location = models.CharField(max_length=240, blank=True, null=True, default='')
 
 	def __str__(self):
 		return self.tweet_text
