@@ -1,6 +1,47 @@
-{% for tweet in Tweets %}
-    <p>{{tweet.tweet_id}}</p>
-    <p>{{tweet.tweet_text}}</p>
-    <p>{{tweet.tweet_user}}</p>
-    <br><br>
-{% endfor %}
+<!doctype html>
+<html lang="en">	
+<head>
+	{% load static %}
+	<!-- Bootstrap CSS files-->
+	<link rel="stylesheet" href="{% static 'main/css/bootstrap.css' %}">
+
+	<!-- Google Open Sans web font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700" rel="stylesheet">
+
+	<!-- Font Awesome Web Icons -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+	<div class="row"></div>
+	<bs-docs-section>
+		<div class="row">
+			<div class="col-4"></div>
+			<div class="col-4">
+				<div class="page-header">
+					<img src="../trek.jpg" alt="trek logo" style="width: 83.333%;height: 120px">
+				</div>
+				<bs-component>
+					<div class="jumbotron" style="padding: 20px">
+						<div class="col">
+							<div class="list-group">
+								{% for tweet in Tweets %}
+								<a class="list-group-item list-group-item-action flex-column align-items-start active" href="#">
+									<div class="d-flex w-100 justify-content-between">
+										<h5 class="mb-1">{{tweet.tweet_user_user_name}}</h5>
+										<small>{{tweet.tweet_created_at}}</small>
+									</div>
+									<p class="mb-1">{{tweet.tweet_text}}</p>
+									<small>{{tweet.tweet_user_location}}</small>
+								</a>
+								{% endfor %}
+							</div>
+						</div>
+					</div> 
+				</bs-component>
+			</div>
+			<div class="col-4"></div>
+		</bs-docs-section>
+	</div>
+</body>
+</html>

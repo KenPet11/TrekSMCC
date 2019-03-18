@@ -3,6 +3,7 @@ from main.models import Twitter_User, Tweet
 import tweepy
 from afinn import Afinn
 from django.utils import timezone
+from datetime import datetime
 
 class Command(BaseCommand):
 	help = 'Scrapes Twitter for Trek tweets and stores them in database'
@@ -18,11 +19,18 @@ class Command(BaseCommand):
 			def on_status(self, status):
 				if 'stolen' not in status.text:
 					tw_created_at = status.created_at
+					tw_year = tw_created_at.strftime("%Y")
+					tw_month = tw_created_at.strftime("%m")
+					tw_day = tw_created_at.strftime("%d")
 					tw_id = status.id_str
 					try:
 						tw_text = status.extended_tweet.full_text
 					except:
 						tw_text = status.text
+					if(tw_text.split()[0] == 'RT'):
+						tw_text = ' '.join(tw_text.split()[1:])
+					if(tw_text.split()[-1].split(':')[0] == 'https'):
+						tw_text = ' '.join(tw_text.split()[:-1])
 					tw_user = status.user.id_str
 					try:
 						tw_longitude = status.coordinates.coordinates[0]
@@ -46,14 +54,16 @@ class Command(BaseCommand):
 						tw_psensitive = 0
 					tw_score = af.score(tw_text)
 					print(tw_score)
+					tweet_user_user_name = status.user.name
+					tweet_user_location = status.user.location
 					user_id = status.user.id
 					user_screen_name = status.user.screen_name
 					user_name = status.user.name
 					user_location = status.user.location
 					user_description = status.user.description
 
-				if not Tweet.objects.filter(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score):
-					t = Tweet(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score)
+				if not Tweet.objects.filter(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day):
+					t = Tweet(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day)
 					print(t)
 					t.save()
 
@@ -71,4 +81,4 @@ class Command(BaseCommand):
 				return True # Don't kill the stream
 
 		sapi = tweepy.streaming.Stream(auth, CustomStreamListener())
-		sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation'])
+		sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes'])
