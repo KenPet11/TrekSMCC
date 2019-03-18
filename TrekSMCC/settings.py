@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+from __future__ import absolute_import
+from celery.schedules import crontab,timedelta
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -37,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main.apps.MainConfig'
+    'main.apps.MainConfig',
 ]
 
 MIDDLEWARE = [
@@ -113,6 +115,19 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Los_Angeles'
+CELERY_BEAT_SCHEDULE = {
+    'task-number-one': {
+        'task': 'summary',
+        'schedule': timedelta(seconds=3),
+    },
+}
 
 
 # Static files (CSS, JavaScript, Images)
