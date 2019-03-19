@@ -17,7 +17,8 @@ class Command(BaseCommand):
 
 		class CustomStreamListener(tweepy.StreamListener):
 			def on_status(self, status):
-				if 'stolen' not in status.text:
+				if 'stolen' not in status.text and 'star' not in status.text and 'Star' not in status.text and 'Stolen' not in status.text:
+					tw_created_at = 0
 					tw_created_at = status.created_at
 					tw_year = tw_created_at.strftime("%Y")
 					tw_month = tw_created_at.strftime("%m")
@@ -80,5 +81,6 @@ class Command(BaseCommand):
 				print >> sys.stderr, 'Timeout...'
 				return True # Don't kill the stream
 
-		sapi = tweepy.streaming.Stream(auth, CustomStreamListener())
-		sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes'])
+		while(1):
+			sapi = tweepy.streaming.Stream(auth, CustomStreamListener())
+			sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes'])
