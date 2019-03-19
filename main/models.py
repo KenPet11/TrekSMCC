@@ -1,5 +1,7 @@
 from django.db import models
 from jsonfield import JSONField
+from django.utils import timezone
+from datetime import datetime
 
 # Create your models here.
 class Twitter_User(models.Model):
@@ -14,7 +16,7 @@ class Twitter_User(models.Model):
 
 
 class Tweet(models.Model):
-	tweet_created_at = models.CharField(max_length=60, blank=True)
+	tweet_created_at = models.DateTimeField(max_length=60, blank=True)
 	tweet_year = models.IntegerField(blank=True, null=True)
 	tweet_month = models.IntegerField(blank=True, null=True)
 	tweet_day = models.IntegerField(blank=True, null=True)

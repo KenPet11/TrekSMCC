@@ -19,7 +19,7 @@
 			<div class="col-4"></div>
 			<div class="col-4">
 				<div class="page-header">
-					<img src="../trek.jpg" alt="trek logo" style="width: 83.333%;height: 120px">
+					<img src="{% static 'main/img/trek.jpg' %}" alt="trek logo" style="width: 100%;height: 120px">
 				</div>
 				<bs-component>
 					<div class="jumbotron" style="padding: 20px">
@@ -40,7 +40,11 @@
 					</div> 
 				</bs-component>
 			</div>
-			<div class="col-4"></div>
+			<div class="col-4">
+				<div class="page-header">
+					<img src="{% static 'main/img/wordcloud.png' %}" alt="wordcloud" style="width: 100%;height: 120px">
+				</div>
+			</div>
 		</bs-docs-section>
 	</div>
 </body>
