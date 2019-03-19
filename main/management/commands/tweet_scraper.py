@@ -4,6 +4,7 @@ import tweepy
 from afinn import Afinn
 from django.utils import timezone
 from datetime import datetime
+import pytz
 
 class Command(BaseCommand):
 	help = 'Scrapes Twitter for Trek tweets and stores them in database'
@@ -18,20 +19,31 @@ class Command(BaseCommand):
 		class CustomStreamListener(tweepy.StreamListener):
 			def on_status(self, status):
 				if 'stolen' not in status.text and 'star' not in status.text and 'Star' not in status.text and 'Stolen' not in status.text:
-					tw_created_at = 0
-					tw_created_at = status.created_at
+					tw_created_at = status.created_at.astimezone(pytz.utc) 
 					tw_year = tw_created_at.strftime("%Y")
 					tw_month = tw_created_at.strftime("%m")
 					tw_day = tw_created_at.strftime("%d")
 					tw_id = status.id_str
 					try:
-						tw_text = status.extended_tweet.full_text
+						tw_text = status.extended_tweet['full_text']
 					except:
 						tw_text = status.text
+					if hasattr(status, 'retweeted_status'):
+						try:
+							tw_text = status.retweeted_status.full_text
+						except:
+							tw_text = status.retweeted_status.text
 					if(tw_text.split()[0] == 'RT'):
 						tw_text = ' '.join(tw_text.split()[1:])
-					if(tw_text.split()[-1].split(':')[0] == 'https'):
-						tw_text = ' '.join(tw_text.split()[:-1])
+					wlist = tw_text.split()
+					for word in wlist:
+						if word[0] == '@':
+							wlist.remove(word)
+					tw_text = ' '.join(wlist)
+					for word in wlist:
+						if word.split(':')[0] == 'https':
+							wlist.remove(word)
+					tw_text = ' '.join(wlist)
 					tw_user = status.user.id_str
 					try:
 						tw_longitude = status.coordinates.coordinates[0]
@@ -83,4 +95,4 @@ class Command(BaseCommand):
 
 		while(1):
 			sapi = tweepy.streaming.Stream(auth, CustomStreamListener())
-			sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes'])
+			sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes', 'trekbikes', 'trekbike'])

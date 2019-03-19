@@ -11,7 +11,7 @@ from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import matplotlib.pyplot as plt
 
 class Command(BaseCommand):
-	help = 'Scrapes Twitter for Trek tweets and stores them in database'
+	help = 'Generates word cloud'
 
 	def handle(self, *args, **kwargs):
 		tweets = Tweet.objects.all().order_by('-tweet_created_at')[:200]
