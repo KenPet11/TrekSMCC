@@ -11,31 +11,24 @@ class Command(BaseCommand):
 	help = 'Scrapes Twitter for Trek tweets and stores them in database'
 
 	def handle(self, *args, **kwargs):
-		tweetCriteria = got3.manager.TweetCriteria().setQuerySearch('Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes', 'trekbikes', 'trekbike').setSince("2017-01-01").setUntil("2019-03-18").setMaxTweets(100)
+		tweetCriteria = got3.manager.TweetCriteria().setQuerySearch('Trek bike OR Trek bicycle OR Trek bicycle corporation OR Trek bikes OR trekbikes OR trekbike').setSince("2017-01-01").setUntil("2019-03-18").setMaxTweets(2000)
 		tweets = got3.manager.TweetManager.getTweets(tweetCriteria)
 		af = Afinn(emoticons=True)
 
 		for tweet in tweets:
 			if 'stolen' not in tweet.text and 'star' not in tweet.text and 'Star' not in tweet.text and 'Stolen' not in tweet.text and 'Ad' not in tweet.text:
-				if hasattr(tweet, 'created at'):
-					tw_created_at = tweet.created_at.astimezone(pytz.utc) 
-					tw_year = tw_created_at.strftime("%Y")
-					tw_month = tw_created_at.strftime("%m")
-					tw_day = tw_created_at.strftime("%d")
-				else:
-					tw_created_at = 0
-				if not hasattr(tweet, 'id_str'):
-					continue
-				tw_id = tweet.id_str
+				tw_created_at = tweet.date
+				tw_year = tw_created_at.strftime("%Y")
+				tw_month = tw_created_at.strftime("%m")
+				tw_day = tw_created_at.strftime("%d")
+				try:
+					tw_id = tweet.id_str
+				except:
+					tw_id = str(tweet.id)
 				try:
 					tw_text = tweet.extended_tweet['full_text']
 				except:
 					tw_text = tweet.text
-				if hasattr(tweet, 'retweeted_status'):
-					try:
-						tw_text = tweet.retweeted_status.full_text
-					except:
-						tw_text = tweet.retweeted_status.text
 				if(tw_text.split()[0] == 'RT'):
 					tw_text = ' '.join(tw_text.split()[1:])
 				wlist = tw_text.split()
@@ -47,40 +40,27 @@ class Command(BaseCommand):
 					if word.split(':')[0] == 'https':
 						wlist.remove(word)
 				tw_text = ' '.join(wlist)
-				tw_user = tweet.user.id_str
 				try:
-					tw_longitude = tweet.coordinates.coordinates[0]
-					tw_latitude = tweet.coordinates.coordinates[1]
+					tw_user = tweet.username
 				except:
-					tw_longitude = None
-					tw_latitude = None
-				tw_place = None 
-				tw_retweet = tweet.retweeted_status
+					tw_user = None
 				try:
-					tw_media = tweet.entities.media.__dict__
+					if tweet.retweets > 0:
+						tw_retweet = 1
 				except:
-					tw_media = None
-				try:
-					tw_hashtags = tweet.entities.hashtags.__dict__
-				except:
-					tw_hashtags = None
-				try:
-					tw_psensitive = tweet.possibly_sensitive
-				except:
-					tw_psensitive = 0
+					tw_retweet = 0
 				tw_score = af.score(tw_text)
-				tweet_user_user_name = tweet.user.name
-				tweet_user_location = tweet.user.location
-				user_id = tweet.user.id
-				user_screen_name = tweet.user.screen_name
-				user_name = tweet.user.name
-				user_location = tweet.user.location
-				user_description = tweet.user.description
+				tweet_user_user_name = tweet.username
+				tweet_user_location = tweet.geo
+				user_id = tweet.author_id
+				user_name = tweet.username
+				user_location = tweet.geo
+				tw_hashtags = tweet.hashtags
 
-				if not Tweet.objects.filter(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day):
-					t = Tweet(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day)
+				if not Tweet.objects.filter(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=None, tweet_latitude=None, tweet_place=None, tweet_retweeted_status=tw_retweet, tweet_media=None, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=0, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day):
+					t = Tweet(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=None, tweet_latitude=None, tweet_place=None, tweet_retweeted_status=tw_retweet, tweet_media=None, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=0, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day)
 					t.save()
 
-					if not Twitter_User.objects.filter(t_id=user_id, t_screen_name=user_screen_name, t_user_name=user_name, t_user_location=user_location, t_user_description = user_description):
-						u = Twitter_User(t_id=user_id, t_screen_name=user_screen_name, t_user_name=user_name, t_user_location=user_location, t_user_description = user_description)
-						u.save(u)
+				if not Twitter_User.objects.filter(t_id=user_id, t_screen_name=None, t_user_name=user_name, t_user_location=user_location, t_user_description = None):
+					u = Twitter_User(t_id=user_id, t_screen_name=None, t_user_name=user_name, t_user_location=user_location, t_user_description = None)
+					u.save(u)

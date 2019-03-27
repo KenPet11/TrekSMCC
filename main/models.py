@@ -6,7 +6,7 @@ from datetime import datetime
 # Create your models here.
 class Twitter_User(models.Model):
 	t_id = models.CharField(max_length=60)
-	t_screen_name = models.CharField(max_length=20)
+	t_screen_name = models.CharField(max_length=20, null=True, blank=True)
 	t_user_name = models.CharField(max_length=60)
 	t_user_location = models.CharField(max_length=240, blank=True, null=True)
 	t_user_description = models.TextField(blank=True, null=True)

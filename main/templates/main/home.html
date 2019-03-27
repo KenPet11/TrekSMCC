@@ -10,6 +10,16 @@
 
 	<!-- Font Awesome Web Icons -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
+	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+	<style>
+	canvas{
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
 </head>
 
 <body>
@@ -44,8 +54,18 @@
 				<div class="media">
 					<img src="{% static 'main/img/wordcloud.png' %}" alt="wordcloud" style="width: 100%;height: 400px">
 				</div>
-				<div class="media">
-					<img src="{% static 'main/img/24hour.png' %}" alt="24hour" style="width: 100%;height: 400px">
+				<div>
+					<div style="width:100%;">
+						<canvas id="canvas"></canvas>
+					</div>
+					<br>
+					<br>
+					<button id="randomizeData">Randomize Data</button>
+					<button id="addDataset">Add Dataset</button>
+					<button id="removeDataset">Remove Dataset</button>
+					<button id="addData">Add Data</button>
+					<button id="removeData">Remove Data</button>
+					<script type="text/javascript" src="{% static 'main/js/24hourchart.js' %}"></script>>
 				</div>
 			</div>
 		</div>

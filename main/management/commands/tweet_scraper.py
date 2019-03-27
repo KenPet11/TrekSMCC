@@ -19,10 +19,16 @@ class Command(BaseCommand):
 		class CustomStreamListener(tweepy.StreamListener):
 			def on_status(self, status):
 				if 'stolen' not in status.text and 'star' not in status.text and 'Star' not in status.text and 'Stolen' not in status.text:
-					tw_created_at = status.created_at.astimezone(pytz.utc) 
-					tw_year = tw_created_at.strftime("%Y")
-					tw_month = tw_created_at.strftime("%m")
-					tw_day = tw_created_at.strftime("%d")
+					try:
+						tw_created_at = status.created_at.astimezone(pytz.utc) 
+						tw_year = tw_created_at.strftime("%Y")
+						tw_month = tw_created_at.strftime("%m")
+						tw_day = tw_created_at.strftime("%d")
+					except:
+						tw_created_at = datetime.now()
+						tw_year = tw_created_at.strftime("%Y")
+						tw_month = tw_created_at.strftime("%m")
+						tw_day = tw_created_at.strftime("%d")
 					tw_id = status.id_str
 					try:
 						tw_text = status.extended_tweet['full_text']
@@ -75,15 +81,15 @@ class Command(BaseCommand):
 					user_location = status.user.location
 					user_description = status.user.description
 
-				if not Tweet.objects.filter(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day):
-					t = Tweet(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day)
-					print(t)
-					t.save()
+					if not Tweet.objects.filter(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day):
+						t = Tweet(tweet_created_at=tw_created_at, tweet_id=tw_id, tweet_text=tw_text, tweet_user=tw_user, tweet_longitude=tw_longitude, tweet_latitude=tw_latitude, tweet_place=tw_place, tweet_retweeted_status=tw_retweet, tweet_media=tw_media, tweet_hashtags=tw_hashtags, tweet_possibly_sensitive=tw_psensitive, tweet_score=tw_score, tweet_user_user_name=tweet_user_user_name, tweet_user_location=tweet_user_location, tweet_year=tw_year, tweet_month=tw_month, tweet_day=tw_day)
+						print(t)
+						t.save()
 
-				if not Twitter_User.objects.filter(t_id=user_id, t_screen_name=user_screen_name, t_user_name=user_name, t_user_location=user_location, t_user_description = user_description):
-					u = Twitter_User(t_id=user_id, t_screen_name=user_screen_name, t_user_name=user_name, t_user_location=user_location, t_user_description = user_description)
-					print(u)
-					u.save(u)
+					if not Twitter_User.objects.filter(t_id=user_id, t_screen_name=user_screen_name, t_user_name=user_name, t_user_location=user_location, t_user_description = user_description):
+						u = Twitter_User(t_id=user_id, t_screen_name=user_screen_name, t_user_name=user_name, t_user_location=user_location, t_user_description = user_description)
+						print(u)
+						u.save(u)
 
 			def on_error(self, status_code):
 				print >> sys.stderr, 'Encountered error with status code:', status_code
