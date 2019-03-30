@@ -13,7 +13,6 @@
 
 	<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
 	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<style>
 	canvas{
 		-moz-user-select: none;
@@ -22,7 +21,6 @@
 	}
 	</style>
 </head>
-
 
 <body>
 	<div class="row"></div>
@@ -74,21 +72,4 @@
 	</bs-docs-section>
 	</div>
 </body>
-
-<script>
-	function fetchwordcloud(){
-		$.ajax({
-			method:"GET",
-			url:'{{ 'test/' }}',
-			success:function() {
-				console.log("done");
-				alert("done");
-			}});
-	}
-
-	$(document).ready(function(){
-		setInterval(fetchwordcloud,5000);
-	});
-</script>
-
 </html>

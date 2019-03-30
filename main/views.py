@@ -9,3 +9,7 @@ def homepage(request):
 	return render(request = request,
 		template_name='main/home.html',
 		context = {"Tweets": latest_tweet_list})
+
+def ajaxtest(request):
+	print("helloworld")
+	return homepage(request)
