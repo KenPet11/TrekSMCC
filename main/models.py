@@ -10,6 +10,7 @@ class Twitter_User(models.Model):
 	t_user_name = models.CharField(max_length=60)
 	t_user_location = models.CharField(max_length=240, blank=True, null=True)
 	t_user_description = models.TextField(blank=True, null=True)
+	t_user_gender = models.CharField(max_length=20, blank=True, null=True, default='')
 
 	def __str__(self):
 		return self.t_user_name
