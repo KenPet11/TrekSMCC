@@ -15,9 +15,16 @@ Including another URLconf
 """
 from django.urls import path
 from . import views
+from django.conf.urls import url
 
 app_name = "main"
 
 urlpatterns = [
     path("", views.homepage, name="homepage"),
+    url(r'^latest/$', views.get_latest, name="latest"),
+    url(r'^feed/$', views.get_latest_feed, name="feed"),
+    url(r'^sendTweet/(?P<tweetid>[\s\S]*)/$', views.send_tweet, name="sendTweet"),
+    url(r'^cloudText/$', views.get_cloud_text, name="cloudText"),
 ]
+
+#(?P<tweetid>\w{0,50})

@@ -14,15 +14,25 @@
 	<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
 	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
 	<style>
-	canvas{
-		-moz-user-select: none;
-		-webkit-user-select: none;
-		-ms-user-select: none;
-	}
+		canvas{
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
 	</style>
 </head>
 
 <body>
+	<script type="text/javascript">
+		var today_data = {{ today_data }};
+    	var today_labels = {{ today_labels|safe }};
+    	var week_data = {{ week_data }};
+    	var week_labels = {{ week_labels|safe }};
+    	var month_data = {{ month_data }};
+    	var month_labels = {{ month_labels|safe }};
+    	var year_data = {{ year_data }};
+    	var year_labels = {{ year_labels|safe }};
+	</script>
 	<div class="row"></div>
 	<bs-docs-section>
 		<div class="row">
@@ -33,26 +43,21 @@
 				</div>
 				<bs-component>
 					<div class="jumbotron" style="padding: 20px">
-						<div class="col">
-							<div class="list-group">
-								{% for tweet in Tweets %}
-								<a class="list-group-item list-group-item-action flex-column align-items-start active" href="#">
-									<div class="d-flex w-100 justify-content-between" style="height: 50px">
-										<h5 class="mb-1">{{tweet.tweet_user_user_name}}</h5>
-										<small>{{tweet.tweet_created_at}}</small>
-									</div>
-									<p class="m-0">{{tweet.tweet_text}}</p>
-									<small>{{tweet.tweet_user_location}}</small>
-								</a>
-								{% endfor %}
+						<div class="col" id="tweetFeed">
+							<div class="list-group" id="feed">
+								<script type="text/javascript" src="{% static 'main/js/feed.js' %}"></script>
 							</div>
 						</div>
 					</div> 
 				</bs-component>
 			</div>
 			<div class="col-4">
-				<div class="media">
-					<img src="{% static 'main/img/wordcloud.png' %}" alt="wordcloud" style="width: 100%;height: 400px">
+				<div id="cloud">
+					<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+					<script src="https://d3js.org/d3.v5.min.js"></script>
+					<script type="text/javascript" src="{% static 'main/js/d3.layout.cloud.js' %}"></script>
+					<script type="text/javascript" src="{% static 'main/js/easywordcloud.js' %}"></script>
+					<script type="text/javascript" src="{% static 'main/js/easy.js' %}"></script>
 				</div>
 				<div>
 					<div style="width:100%;">
@@ -60,16 +65,17 @@
 					</div>
 					<br>
 					<br>
-					<button id="randomizeData">Randomize Data</button>
-					<button id="addDataset">Add Dataset</button>
-					<button id="removeDataset">Remove Dataset</button>
-					<button id="addData">Add Data</button>
-					<button id="removeData">Remove Data</button>
-					<script type="text/javascript" src="{% static 'main/js/24hourchart.js' %}"></script>>
+					<script type="text/javascript" src="{% static 'main/js/mainWindow.js' %}"></script>
+					<div class="btn-group btn-block">
+						<button class="btn btn-outline-danger" type="button" id="Live">Live</button>
+						<button class="btn btn-outline-primary" type="button" id="24_Hour" width="15%" onclick="makeChart(today_labels, today_data, 'day')">Day</button>
+						<button class="btn btn-outline-success" type="button" id="1_Week" width="15%" onclick="makeChart(week_labels, week_data, 'week')">Week</button>
+						<button class="btn btn-outline-info" type="button" id="1_Month" width="15%" onclick="makeChart(month_labels, month_data, 'month')">Month</button>
+						<button class="btn btn-outline-warning" type="button" id="1_Year" width="15%" onclick="makeChart(year_labels, year_data, 'year')">Year</button>
+					</div>
 				</div>
 			</div>
 		</div>
 	</bs-docs-section>
-	</div>
 </body>
 </html>
