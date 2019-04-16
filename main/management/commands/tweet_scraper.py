@@ -100,5 +100,8 @@ class Command(BaseCommand):
 				return True # Don't kill the stream
 
 		while(1):
-			sapi = tweepy.streaming.Stream(auth, CustomStreamListener())
-			sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes', 'trekbikes', 'trekbike'])
+			try:
+				sapi = tweepy.streaming.Stream(auth, CustomStreamListener())
+				sapi.filter(track=['Trek bike', 'Trek bicycle', 'Trek bicycle corporation', 'Trek bikes', 'trekbikes', 'trekbike'])
+			except:
+				pass
