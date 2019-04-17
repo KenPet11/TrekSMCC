@@ -4,8 +4,10 @@ window.makeWordCloud = function(data, parent_elem, svgscale, svg_class, font, ro
 
       function draw(words) {
         d3.select(parent_elem).append("svg")
-            .attr("width", svgscale)
-            .attr("height", svgscale)
+            .attr("width", "100%")
+            .attr("height", 550)
+            //.attr("viewBox", "0 0 50 50")
+            //.attr("preserveAspectRatio", "none")
             .attr("class", svg_class)
           .append("g")
             .attr("transform", "translate(" + svgscale / 2 + "," + svgscale / 2 + ")")

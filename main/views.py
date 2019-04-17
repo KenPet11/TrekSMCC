@@ -14,6 +14,11 @@ import random
 from nltk.corpus import stopwords
 from dateutil.relativedelta import *
 from pytz import common_timezones
+from django.http import HttpResponseRedirect
+from django.core import serializers
+from django.http import JsonResponse
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 auth = tweepy.OAuthHandler("fwrSfG4uSUYv4iE38sMADRXRk", "i41PVv11Eh1wSue3aAhrucPE3Mcye5zRwALvMUikmO3KiwEMqh")
 auth.set_access_token("1087756438288719873-qChEYx47VTjmU3POUIrK3WnZQK86NE", "VbyFkxUw8uRYWw3BCmj5EfGw7HxMqJa3yjQtmHZMt9HZp")
@@ -117,9 +122,16 @@ def homepage(request):
 		year_time.append(last_year.strftime("%B %Y"))
 		last_year = last_year + relativedelta(months=1)
 
+	users = list(Twitter_User.objects.values_list('t_user_gender'))
+	locations = list(Tweet.objects.values_list('tweet_place'))
+
 	return render(request = request,
 		template_name='main/home.html',
-		context = {"today_data":day_score, "today_labels": day_time, "week_data":week_score, "week_labels":week_time, "month_data":month_score, "month_labels":month_time, "year_data":year_score, "year_labels":year_time})
+		context = {"Twitter_Users":json.dumps({'data':users}), "tweet_place":json.dumps({'places':locations}), "today_data":day_score, "today_labels": day_time, "week_data":week_score, "week_labels":week_time, "month_data":month_score, "month_labels":month_time, "year_data":year_score, "year_labels":year_time})
+
+def ajaxtest(request):
+	print("helloworld")
+	return homepage(request)
 
 #create method that returns data in json (json python library)
 #in java, use tie function to updata data , and rebuid the chart)
@@ -152,7 +164,7 @@ def get_latest(request):
 				hour_string = str(hour)
 				if hour < 10:
 					hour_string = "0" + hour_string
-				if hour_string == tweet.tweet_created_at.strftime("%H"):
+				if hour_string == tweet.tweet_created_at.astimezone(central).strftime("%H"):
 					score_total += tweet.tweet_score
 					num += 1
 				else:
@@ -180,7 +192,7 @@ def get_latest(request):
 					continue
 			if num > 0:
 				scores.append(score_total / num)
-				hour_string = str(round((int(oldest_date.strftime("%H")) - minute) / 60))
+				hour_string = str(round((int(oldest_date.astimezone(central).strftime("%H")) - minute) / 60))
 				minute_string = str(round(minute % 60))
 				if len(minute_string) == 1:
 					minute_string = "0" + minute_string
@@ -222,15 +234,25 @@ def get_latest_feed(request):
 	return_object["tweetUserDisplay"] = tweetUserDisplay
 	return HttpResponse(json.dumps(return_object), content_type='application/json')
 
-def send_tweet(request, tweetid):
+def send_tweet(request):
+	print("hi")
+	data=json.loads(request.body.decode("utf-8"))
+	print(data)
+	tweetID = data['tweetID']
+	tweetTextToSend = data['tweetTextToSend']
+	print(tweetTextToSend, tweetID)
+	s = api.update_status(tweetTextToSend, tweetID)
+	return_object = {}
+	return_object['result'] = 'success'
+	return HttpResponse(json.dumps(return_object), content_type='application/json')
+
+def get_tweet(request, tweetid):
 	tid_list = tweetid.split(" ")
 	tid = tid_list[0]
 	tuid = ('').join(tid_list[1:])
-	m = "@%s Hello!" % (tuid)
-	print(m, tid)
-	s = api.update_status(m, tid)
 	return_object = {}
-	return_object['result'] = 'success'
+	return_object['screenName'] = tuid
+	return_object['tweetID'] = tid
 	return HttpResponse(json.dumps(return_object), content_type='application/json')
 
 def get_cloud_text(request):

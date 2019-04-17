@@ -3,7 +3,26 @@ var current_tab = "live";
 var live_data = [];
 var live_labels = [];
 var chartColor;
+var tweetID;
+var screenName;
+var tweetTextToSend;
 
+
+var csrfcookie = function() {
+    var cookieValue = null,
+        name = 'csrftoken';
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+};
 
 function makeChart(labels, data, tab){
 
@@ -90,18 +109,38 @@ function getData(){
 	xhr.send();
 }
 
-function respondToTweet(args){
-	console.log(args);
+function respondToTweet(){
 	let http = new XMLHttpRequest();
 
 	http.onreadystatechange = function () {
-		if (this.readyState == 4 && (this.status == 200 || this.status == 404)){
+		if (this.readyState == 4 && (this.status == 200)){
 			//let data = JSON.parse(this.responseText);
 			console.log(this.responseText)
 		}
 	};
 	
-	http.open("GET", "/sendTweet/" + args, true);
+	http.open("POST", "/sendTweet/", true);
+	http.setRequestHeader('Content-Type', 'application/json');
+	http.setRequestHeader('X-CSRFToken', csrfcookie());
+	http.send(JSON.stringify({
+    'tweetID': tweetID,
+    'tweetTextToSend': tweetTextToSend,
+	}));
+}
+
+function fillRespondToTweet(args){
+	let http = new XMLHttpRequest();
+
+	http.onreadystatechange = function () {
+		if (this.readyState == 4 && (this.status == 200)){
+			let data = JSON.parse(this.responseText);
+			tweetID = data['tweetID'];
+			screenName = data['screenName'];
+			document.getElementById('tweetTextArea').value = "@" + screenName;
+		}
+	};
+	
+	http.open("GET", "/getTweet/" + args, true);
 	http.send();
 }
 
@@ -115,11 +154,20 @@ window.onload = function() {
 	setInterval(getFeed, 60000);
 	getFeed();
 	document.getElementById("feed").addEventListener("click",function(e) {
+		document.getElementById('tweetTextArea').value = null;
         if(e.target && (e.target.nodeName == "A" || e.target.nodeName == "P") ) {
-            console.log(e.target.id + " was clicked");
-            respondToTweet(e.target.id);
+            fillRespondToTweet(e.target.id);
+        }
+    });
+    document.getElementById("tweetSubmit").addEventListener("click",function(e) {
+        if(e.target) {
+            console.log("submit was clicked");
+            tweetTextToSend = document.getElementById('tweetTextArea').value;
+            console.log(tweetTextToSend)
+            respondToTweet();
         }
     });
     setInterval(getWordCloud, 60000);
     getWordCloud();
 };
+
