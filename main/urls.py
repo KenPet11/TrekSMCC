@@ -23,8 +23,8 @@ urlpatterns = [
     path("", views.homepage, name="homepage"),
     url(r'^latest/$', views.get_latest, name="latest"),
     url(r'^feed/$', views.get_latest_feed, name="feed"),
-    url(r'^sendTweet/(?P<tweetid>[\s\S]*)/$', views.send_tweet, name="sendTweet"),
+    url(r'^sendTweet/$', views.send_tweet, name="sendTweet"),
     url(r'^cloudText/$', views.get_cloud_text, name="cloudText"),
+    url(r'^getTweet/(?P<tweetid>[\s\S]*)/$', views.get_tweet, name="getTweet"),
+    path("test/",views.ajaxtest,name="ajaxtest"),
 ]
-
-#(?P<tweetid>\w{0,50})
