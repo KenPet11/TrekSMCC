@@ -46,8 +46,10 @@
 	<bs-docs-section>
 		<div class="row">
 			<div class="col-4">
-				<svg id="fillgauge1" width="25%" height="200" onclick="gauge1.update(NewValue());"></svg>
-				<svg id="fillgauge2" width="25%" height="200" onclick="gauge2.update(NewValue());"></svg>
+				<ul class="gender">
+					<li><svg id="fillgauge1"  height="200"></svg></li>
+					<li><svg id="fillgauge2"  height="200"></svg></li>
+				</ul>
 			</div>
 			<div class="col-4">
 				<div class="page-header">
@@ -119,7 +121,7 @@
 	for (user in Twitter_Users['data']) {
 		if (Twitter_Users['data'][user]=="male") {
 			male+=1;
-		} else {
+		} else if (Twitter_Users['data'][user]=="female") {
 			female+=1;
 		}
 	}
@@ -145,7 +147,7 @@
 	config1.textVertPosition = 0.8;
 	config1.waveAnimateTime = 2000;
 	config1.waveHeight = 0.3;
-	config.waveCount = 1;
+	config1.waveCount = 1;
 	var config2 = liquidFillGaugeDefaultSettings();
 	config2.circleThickness = 0.2;
 	config2.circleFillGap = 0.2;
