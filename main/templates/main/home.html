@@ -167,19 +167,4 @@
 
 </body>
 
-<script>
-	function fetchwordcloud(){
-		$.ajax({
-			method:"GET",
-			url:'{{ 'test/' }}',
-			success:function() {
-				console.log("done");
-				//alert("done");
-			}});
-	}
-
-	$(document).ready(function(){
-		setInterval(fetchwordcloud,5000);
-	});
-</script>
 </html>
