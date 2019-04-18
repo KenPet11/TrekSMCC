@@ -17,6 +17,9 @@
 
 	<meta charset="UTF-8">
     <title></title>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="{% static 'main/js/datamaps.world.min.js' %}"></script>
     <script src="http://d3js.org/d3.v3.min.js" language="JavaScript"></script>
     <script src="{% static 'main/js/liquidFillGauge.js' %}"></script>
     <style>
@@ -50,6 +53,71 @@
 					<li><svg id="fillgauge1"  height="200"></svg></li>
 					<li><svg id="fillgauge2"  height="200"></svg></li>
 				</ul>
+				<div id="container" style="position: relative; width: 600px; height: 400px;"></div>
+				<script>
+					var User_locss = unescape('{{User_location | escapejs}}');
+					var User_locs = JSON.parse(User_locss);
+					var Loc_freqs = unescape('{{Loc_freq | escapejs}}');
+					var Loc_freq = JSON.parse(Loc_freqs);
+					console.log(User_locs);
+					console.log(Loc_freq);
+					var max_freq = Math.max(Loc_freq['freq']);
+    				//var map = new Datamap({element: document.getElementById('container')});
+					var bombMap = new Datamap({
+    element: document.getElementById('container'),
+    scope: 'world',
+    geographyConfig: {
+        popupOnHover: false,
+        highlightOnHover: false,
+    },
+    fills: {
+        'Major': '#1f77b4',
+        'Medium': '#9467bd',
+        'Minor': '#ff7f0e',
+        defaultFill: '#EDDC4E'
+    },
+    data: {
+        'RUS': {fillKey: 'RUS'},
+        'PRK': {fillKey: 'PRK'},
+        'PRC': {fillKey: 'PRC'},
+        'IND': {fillKey: 'IND'},
+        'GBR': {fillKey: 'GBR'},
+        'FRA': {fillKey: 'FRA'},
+        'PAK': {fillKey: 'PAK'},
+        'USA': {fillKey: 'USA'}
+    }
+});
+	var bombs = [];
+	for (var i = 0; i < User_locs['user_location'].length; i++){
+		var bomb = {}
+		bomb['borderColor'] = "#800000";
+		if (Loc_freq['freq'][i] > 20) {
+			bomb['fillKey'] = 'Major';
+		}
+		else if (Loc_freq['freq'][i] > 10) {
+			bomb['fillKey'] = 'Medium';
+		} else if (Loc_freq['freq'][i] > 5) {
+			bomb['fillKey'] = 'Minor';
+		} 
+			
+		bomb['radius'] = 4*Loc_freq['freq'][i];
+		bomb['latitude'] = User_locs['user_location'][i][0];
+		bomb['longitude'] = User_locs['user_location'][i][1];
+		bombs.push(bomb);
+	}
+	console.log(bombs);
+
+//draw bubbles for bombs
+bombMap.bubbles(bombs, {
+    popupTemplate: function (geo, data) {
+            return ['<div class="hoverinfo">' +  data.name,
+            '<br/>Payload: ' +  data.yield + ' kilotons',
+            '<br/>Country: ' +  data.country + '',
+            '<br/>Date: ' +  data.date + '',
+            '</div>'].join('');
+    }
+});
+				</script>
 			</div>
 			<div class="col-4">
 				<div class="page-header">
