@@ -18,6 +18,9 @@ from django.http import HttpResponseRedirect
 from django.core import serializers
 from django.http import JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
+import geopy
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 
 
 auth = tweepy.OAuthHandler("fwrSfG4uSUYv4iE38sMADRXRk", "i41PVv11Eh1wSue3aAhrucPE3Mcye5zRwALvMUikmO3KiwEMqh")
@@ -25,7 +28,7 @@ auth.set_access_token("1087756438288719873-qChEYx47VTjmU3POUIrK3WnZQK86NE", "Vby
 
 api = tweepy.API(auth)
 
-central = pytz.timezone('US/Central')
+central = pytz.timezone('America/Chicago')
 
 # Create your views here.
 def homepage(request):
@@ -122,16 +125,9 @@ def homepage(request):
 		year_time.append(last_year.strftime("%B %Y"))
 		last_year = last_year + relativedelta(months=1)
 
-	users = list(Twitter_User.objects.values_list('t_user_gender'))
-	locations = list(Tweet.objects.values_list('tweet_place'))
-
 	return render(request = request,
 		template_name='main/home.html',
-		context = {"Twitter_Users":json.dumps({'data':users}), "tweet_place":json.dumps({'places':locations}), "today_data":day_score, "today_labels": day_time, "week_data":week_score, "week_labels":week_time, "month_data":month_score, "month_labels":month_time, "year_data":year_score, "year_labels":year_time})
-
-def ajaxtest(request):
-	print("helloworld")
-	return homepage(request)
+		context = {"today_data":day_score, "today_labels": day_time, "week_data":week_score, "week_labels":week_time, "month_data":month_score, "month_labels":month_time, "year_data":year_score, "year_labels":year_time})
 
 #create method that returns data in json (json python library)
 #in java, use tie function to updata data , and rebuid the chart)
@@ -176,7 +172,7 @@ def get_latest(request):
 
 
 	else:
-		newest_date = latest_tweet_list[0].tweet_created_at
+		newest_date = latest_tweet_list[0].tweet_created_at.astimezone(pytz.utc)
 		minute_difference = (newest_date - oldest_date).total_seconds() / 60
 		minute = 0
 
@@ -192,7 +188,8 @@ def get_latest(request):
 					continue
 			if num > 0:
 				scores.append(score_total / num)
-				hour_string = str(round((int(oldest_date.astimezone(central).strftime("%H")) - minute) / 60))
+				#hour_string = str(round((int(oldest_date.astimezone(central).strftime("%H")) - minute) / 60))
+				hour_string = str(oldest_date.astimezone(central).strftime("%H"))
 				minute_string = str(round(minute % 60))
 				if len(minute_string) == 1:
 					minute_string = "0" + minute_string
@@ -218,8 +215,8 @@ def get_latest_feed(request):
 
 	for tweet in latest_tweet_list:
 		tweetText.append(tweet.tweet_text)
-		tweetCreatedAt.append(tweet.tweet_created_at.strftime("%a %m/%d/%Y, %H:%M %p"))
-		user = Twitter_User.objects.get(t_user_name=tweet.tweet_user_user_name)
+		tweetCreatedAt.append(tweet.tweet_created_at.astimezone(central).strftime("%a %m/%d/%Y, %H:%M %p"))
+		user = Twitter_User.objects.filter(t_user_name=tweet.tweet_user_user_name).first()
 		userName.append(user.t_screen_name)
 		tweetLocation.append(tweet.tweet_user_location)
 		tweetID.append(tweet.tweet_id)
@@ -277,4 +274,34 @@ def get_cloud_text(request):
 		return_list.append(newDict)
 	
 	return_object["cloudText"] = return_list[:125]
+	return HttpResponse(json.dumps(return_object), content_type='application/json')
+
+def get_gender_data(request):
+	male = 0
+	female = 0
+	for user in Twitter_User.objects.all():
+		if user.t_user_gender == 'male':
+			male +=1
+		elif user.t_user_gender == 'female':
+			female +=1
+
+	return_object = {}
+	return_object['male'] = male
+	return_object['female'] = female
+	return HttpResponse(json.dumps(return_object), content_type='application/json')
+
+def get_map_data(request):
+	data = []
+	for tweet in Tweet.objects.filter(tweet_longitude__isnull=False).order_by('-tweet_created_at')[:200]:
+		newData = {}
+		if tweet.tweet_user_location != None and tweet.tweet_user_location != 'tweet_user_location' and tweet.tweet_longitude != None:
+			newData['name'] = tweet.tweet_user_location
+			newData['latitude'] = tweet.tweet_latitude
+			newData['longitude'] = tweet.tweet_longitude
+			newData['radius'] = 10
+			newData['fillKey'] = 'gt50'
+			data.append(newData)
+
+	return_object = {}
+	return_object['locations'] = data
 	return HttpResponse(json.dumps(return_object), content_type='application/json')

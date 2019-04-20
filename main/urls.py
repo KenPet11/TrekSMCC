@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^feed/$', views.get_latest_feed, name="feed"),
     url(r'^sendTweet/$', views.send_tweet, name="sendTweet"),
     url(r'^cloudText/$', views.get_cloud_text, name="cloudText"),
+    url(r'^genderData/$', views.get_gender_data, name="genderData"),
     url(r'^getTweet/(?P<tweetid>[\s\S]*)/$', views.get_tweet, name="getTweet"),
-    path("test/",views.ajaxtest,name="ajaxtest"),
+    url(r'^mapData/$', views.get_map_data, name="mapData"),
 ]

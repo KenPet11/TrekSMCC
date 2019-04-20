@@ -22,6 +22,7 @@ function updateFeed(tweetText, tweetCreatedAt, tweetUserDisplay, tweetLocation, 
 	    var a = document.createElement("a");
 	    a.setAttribute('id', tweetID[i]+ " " + userName[i]);
 	    a.setAttribute('class',"list-group-item list-group-item-action flex-column align-items-start active");
+	    a.setAttribute('style', "border-style: double; border-color: #adb5bd");
 
 
 	    var div = document.createElement("div");
@@ -52,7 +53,11 @@ function updateFeed(tweetText, tweetCreatedAt, tweetUserDisplay, tweetLocation, 
 	    a.appendChild(p);
 
 	   	var small = document.createElement("small");
-	  	var location = document.createTextNode(tweetLocation[i]); 
+	   	var locText = tweetLocation[i];
+	   	if (locText == null){
+	   		locText = '';
+	   	}
+	  	var location = document.createTextNode(locText); 
 	  	small.appendChild(location);  
 	  	a.appendChild(small);
 

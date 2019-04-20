@@ -6,6 +6,7 @@ var chartColor;
 var tweetID;
 var screenName;
 var tweetTextToSend;
+var user_gender = user_gender;
 
 
 var csrfcookie = function() {
@@ -145,6 +146,8 @@ function fillRespondToTweet(args){
 }
 
 window.onload = function() {
+    setInterval(getMapElement, 60000);
+    getMapElement();
 	setInterval(getData, 60000);
 	makeChart(live_data, live_labels, "live");
 	getData();
@@ -161,13 +164,13 @@ window.onload = function() {
     });
     document.getElementById("tweetSubmit").addEventListener("click",function(e) {
         if(e.target) {
-            console.log("submit was clicked");
             tweetTextToSend = document.getElementById('tweetTextArea').value;
-            console.log(tweetTextToSend)
             respondToTweet();
         }
     });
     setInterval(getWordCloud, 60000);
     getWordCloud();
+    setInterval(getGenderElement, 60000);
+    getGenderElement();
 };
 

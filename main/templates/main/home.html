@@ -13,15 +13,10 @@
 
 	<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
 	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 	<meta charset="UTF-8">
     <title></title>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-    <script src="{% static 'main/js/datamaps.world.min.js' %}"></script>
-    <script src="http://d3js.org/d3.v3.min.js" language="JavaScript"></script>
-    <script src="{% static 'main/js/liquidFillGauge.js' %}"></script>
+
     <style>
         .liquidFillGaugeText { font-family: Helvetica; font-weight: bold; }
     </style>
@@ -49,79 +44,28 @@
 	<bs-docs-section>
 		<div class="row">
 			<div class="col-4">
+				<div id="mapContainer"  style="width:100%; margin: 100px" >
+					<div id="map" style="position: relative; width: 80%; max-height: 600px;"></div>
+					<script src="http://d3js.org/d3.v3.min.js"></script>
+	  				<script src="http://d3js.org/topojson.v1.min.js"></script>
+	  				<script  type="text/javascript" src="{% static 'main/js/datamaps.world.min.js' %}"></script>
+					<script  type="text/javascript" src="{% static 'main/js/mapElement.js' %}"></script>
+				</div>
+				<br>
+				<br>
 				<ul class="gender">
-					<li><svg id="fillgauge1"  height="200"></svg></li>
-					<li><svg id="fillgauge2"  height="200"></svg></li>
+					<li>
+						<div id="genderBlock">
+							<svg id="gendergauge" width="100%" height="200"></svg>
+							<script  type="text/javascript" src="{% static 'main/js/genderElement.js' %}"></script>
+						</div>
+					</li>
 				</ul>
 				<div id="container" style="position: relative; width: 600px; height: 400px;"></div>
-				<script>
-					var User_locss = unescape('{{User_location | escapejs}}');
-					var User_locs = JSON.parse(User_locss);
-					var Loc_freqs = unescape('{{Loc_freq | escapejs}}');
-					var Loc_freq = JSON.parse(Loc_freqs);
-					console.log(User_locs);
-					console.log(Loc_freq);
-					var max_freq = Math.max(Loc_freq['freq']);
-    				//var map = new Datamap({element: document.getElementById('container')});
-					var bombMap = new Datamap({
-    element: document.getElementById('container'),
-    scope: 'world',
-    geographyConfig: {
-        popupOnHover: false,
-        highlightOnHover: false,
-    },
-    fills: {
-        'Major': '#1f77b4',
-        'Medium': '#9467bd',
-        'Minor': '#ff7f0e',
-        defaultFill: '#EDDC4E'
-    },
-    data: {
-        'RUS': {fillKey: 'RUS'},
-        'PRK': {fillKey: 'PRK'},
-        'PRC': {fillKey: 'PRC'},
-        'IND': {fillKey: 'IND'},
-        'GBR': {fillKey: 'GBR'},
-        'FRA': {fillKey: 'FRA'},
-        'PAK': {fillKey: 'PAK'},
-        'USA': {fillKey: 'USA'}
-    }
-});
-	var bombs = [];
-	for (var i = 0; i < User_locs['user_location'].length; i++){
-		var bomb = {}
-		bomb['borderColor'] = "#800000";
-		if (Loc_freq['freq'][i] > 20) {
-			bomb['fillKey'] = 'Major';
-		}
-		else if (Loc_freq['freq'][i] > 10) {
-			bomb['fillKey'] = 'Medium';
-		} else if (Loc_freq['freq'][i] > 5) {
-			bomb['fillKey'] = 'Minor';
-		} 
-			
-		bomb['radius'] = 4*Loc_freq['freq'][i];
-		bomb['latitude'] = User_locs['user_location'][i][0];
-		bomb['longitude'] = User_locs['user_location'][i][1];
-		bombs.push(bomb);
-	}
-	console.log(bombs);
-
-//draw bubbles for bombs
-bombMap.bubbles(bombs, {
-    popupTemplate: function (geo, data) {
-            return ['<div class="hoverinfo">' +  data.name,
-            '<br/>Payload: ' +  data.yield + ' kilotons',
-            '<br/>Country: ' +  data.country + '',
-            '<br/>Date: ' +  data.date + '',
-            '</div>'].join('');
-    }
-});
-				</script>
 			</div>
 			<div class="col-4">
-				<div class="page-header">
-					<img src="{% static 'main/img/trek.jpg' %}" alt="trek logo" style="width: 100%;height: 120px">
+				<div class="page-header" style="padding: 20px">
+					<img src="{% static 'main/img/trek.png' %}" alt="trek logo" style="width: 100%;height: 120px">
 				</div>
 				<bs-component>
 					<div class="jumbotron" style="padding: 20px">
@@ -136,7 +80,7 @@ bombMap.bubbles(bombs, {
 					<form method="post">
 						{% csrf_token %}
 						  <fieldset>
-						    <div class="form-group">
+						    <div class="form-group" style="margin: 0px 0px 5px 0px">
 						    	<ul class="nav nav-pills flex-column">
 	  								<li class="nav-item">
 	    								<a class="nav-link active" href="#">Respond to Tweet</a>
@@ -150,16 +94,11 @@ bombMap.bubbles(bombs, {
 				</div>
 			</div>
 			<div class="col-4">
-				<div id="cloud" style="width:100%">
-					<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-					<script src="https://d3js.org/d3.v5.min.js"></script>
-					<script type="text/javascript" src="{% static 'main/js/d3.layout.cloud.js' %}"></script>
-					<script type="text/javascript" src="{% static 'main/js/easywordcloud.js' %}"></script>
-					<script type="text/javascript" src="{% static 'main/js/easy.js' %}"></script>
+				<div id="cloud" style="width:100%; margin: 25px 100px 25px 100px">
 				</div>
 				<div>
-					<div style="width:100%">
-						<canvas id="canvas" style="width:100%"></canvas>
+					<div style="width:100%"" >
+						<canvas id="canvas" style="width:100%""></canvas>
 					</div>
 					<br>
 					<br>
@@ -176,65 +115,12 @@ bombMap.bubbles(bombs, {
 		</div>
 	</bs-docs-section>
 </div>
+<script  type="text/javascript" src="{% static 'main/js/liquidFillGauge.js' %}"></script>
 
-<script language="JavaScript">
-	var count = 0;
-	var male = 0;
-	var female = 0;
-	var Twitter_Userss = unescape('{{Twitter_Users | escapejs}}');
-	var Twitter_Users = JSON.parse(Twitter_Userss);
-	var tweet_places = unescape('{{tweet_place | escapejs}}');
-	var tweet_place = JSON.parse(tweet_places);
-	console.log(Twitter_Users)
-	for (user in Twitter_Users['data']) {
-		if (Twitter_Users['data'][user]=="male") {
-			male+=1;
-		} else if (Twitter_Users['data'][user]=="female") {
-			female+=1;
-		}
-	}
-	for (locations in tweet_place['places']) {
-		if (tweet_place['places'][locations]!='null') {
-			count+=1;
-		}
-	}
-	console.log("count");
-	console.log(count);
-	console.log("male")
-	console.log(male)
-	console.log("female")
-	console.log(female)
-	console.log(male/(female+male))
-	var config1 = liquidFillGaugeDefaultSettings();
-	config1.circleColor = "#FF7777";
-	config1.textColor = "#FF4444";
-	config1.waveTextColor = "#FFAAAA";
-	config1.waveColor = "#FFDDDD";
-	config1.circleThickness = 0.2;
-	config1.circleFillGap = 0.2;
-	config1.textVertPosition = 0.8;
-	config1.waveAnimateTime = 2000;
-	config1.waveHeight = 0.3;
-	config1.waveCount = 1;
-	var config2 = liquidFillGaugeDefaultSettings();
-	config2.circleThickness = 0.2;
-	config2.circleFillGap = 0.2;
-	config2.textVertPosition = 0.8;
-	config2.waveAnimateTime = 2000;
-	config2.waveHeight = 0.3;
-	config2.waveCount = 1;
-
-	var gauge1 = loadLiquidFillGauge("fillgauge1", 100*male/(male+female),config2);
-	var gauge2= loadLiquidFillGauge("fillgauge2", 100*female/(male+female), config1);
-	function NewValue(){
-		if(Math.random() > .5){
-			return Math.round(Math.random()*100);
-		} else {
-			return (Math.random()*100).toFixed(1);
-		}
-	}
-</script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script type="text/javascript" src="{% static 'main/js/d3.layout.cloud.js' %}"></script>
+<script type="text/javascript" src="{% static 'main/js/easywordcloud.js' %}"></script>
+<script type="text/javascript" src="{% static 'main/js/easy.js' %}"></script>
 </body>
-
 </html>

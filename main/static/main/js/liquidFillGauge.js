@@ -99,9 +99,16 @@ function loadLiquidFillGauge(elementId, value, config) {
     // Center the gauge within the parent SVG.
     var gaugeGroup = gauge.append("g")
         .attr('transform','translate('+locationX+','+locationY+')');
+    
+
+    gaugeGroup.append("circle")
+        .attr("r", fillCircleRadius)
+        .attr("cx", radius)
+        .attr("cy", radius)
+        .style("fill", "#e83e8c");
 
     // Draw the outer circle.
-    var gaugeCircleArc = d3.svg.arc()
+    var gaugeCircleArc = d3.arc()
         .startAngle(gaugeCircleX(0))
         .endAngle(gaugeCircleX(1))
         .outerRadius(gaugeCircleY(radius))
@@ -121,7 +128,7 @@ function loadLiquidFillGauge(elementId, value, config) {
         .attr('transform','translate('+radius+','+textRiseScaleY(config.textVertPosition)+')');
 
     // The clipping wave area.
-    var clipArea = d3.svg.area()
+    var clipArea = d3.area()
         .x(function(d) { return waveScaleX(d.x); } )
         .y0(function(d) { return waveScaleY(Math.sin(Math.PI*2*config.waveOffset*-1 + Math.PI*2*(1-config.waveCount) + d.y*2*Math.PI));} )
         .y1(function(d) { return (fillCircleRadius*2 + waveHeight); } );
@@ -172,7 +179,7 @@ function loadLiquidFillGauge(elementId, value, config) {
             .transition()
             .duration(config.waveRiseTime)
             .attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(fillPercent)+')')
-            .each("start", function(){ wave.attr('transform','translate(1,0)'); }); // This transform is necessary to get the clip wave positioned correctly when waveRise=true and waveAnimate=false. The wave will not position correctly without this, but it's not clear why this is actually necessary.
+            .on("start", function(){ wave.attr('transform','translate(1,0)'); }); // This transform is necessary to get the clip wave positioned correctly when waveRise=true and waveAnimate=false. The wave will not position correctly without this, but it's not clear why this is actually necessary.
     } else {
         waveGroup.attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(fillPercent)+')');
     }
@@ -183,10 +190,10 @@ function loadLiquidFillGauge(elementId, value, config) {
         wave.attr('transform','translate('+waveAnimateScale(wave.attr('T'))+',0)');
         wave.transition()
             .duration(config.waveAnimateTime * (1-wave.attr('T')))
-            .ease('linear')
+            .ease(d3.easeLinear)
             .attr('transform','translate('+waveAnimateScale(1)+',0)')
             .attr('T', 1)
-            .each('end', function(){
+            .on('end', function(){
                 wave.attr('T', 0);
                 animateWave(config.waveAnimateTime);
             });
@@ -228,7 +235,7 @@ function loadLiquidFillGauge(elementId, value, config) {
             var waveScaleY = d3.scale.linear().range([0,waveHeight]).domain([0,1]);
             var newClipArea;
             if(config.waveHeightScaling){
-                newClipArea = d3.svg.area()
+                newClipArea = d3.area()
                     .x(function(d) { return waveScaleX(d.x); } )
                     .y0(function(d) { return waveScaleY(Math.sin(Math.PI*2*config.waveOffset*-1 + Math.PI*2*(1-config.waveCount) + d.y*2*Math.PI));} )
                     .y1(function(d) { return (fillCircleRadius*2 + waveHeight); } );
@@ -245,7 +252,7 @@ function loadLiquidFillGauge(elementId, value, config) {
                 .attr('d', newClipArea)
                 .attr('transform','translate('+newWavePosition+',0)')
                 .attr('T','1')
-                .each("end", function(){
+                .on("end", function(){
                     if(config.waveAnimate){
                         wave.attr('transform','translate('+waveAnimateScale(0)+',0)');
                         animateWave(config.waveAnimateTime);
