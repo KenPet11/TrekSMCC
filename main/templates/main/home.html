@@ -52,15 +52,15 @@
 					<script  type="text/javascript" src="{% static 'main/js/mapElement.js' %}"></script>
 				</div>
 				<br>
-				<br>
-				<ul class="gender">
-					<li>
-						<div id="genderBlock">
-							<svg id="gendergauge" width="100%" height="200"></svg>
-							<script  type="text/javascript" src="{% static 'main/js/genderElement.js' %}"></script>
-						</div>
-					</li>
-				</ul>
+				<div id="genderBlock" style="display: inline-block">
+					<svg style="display: inline-block" id="gendergauge" width="100%" height="200"></svg>
+					<script  type="text/javascript" src="{% static 'main/js/genderElement.js' %}"></script>
+				</div>
+				<div id="labelCol" style="display: inline-block; width: 100%">
+					<div style="text-align: center;">
+						<div id="genderLabel" style="display: inline-block"></div>
+					</div>
+				</div>
 				<div id="container" style="position: relative; width: 600px; height: 400px;"></div>
 			</div>
 			<div class="col-4">

@@ -16,6 +16,7 @@ function getGenderElement(){
             male = data['male'];
             female = data['female'];
             removeElement("gendergauge");
+            removeElement("labelCol");
             makeGenderElement(male, female);
         }
     };
@@ -30,6 +31,7 @@ function makeGenderElement(male, female){
     svg.setAttribute('id','gendergauge');
     svg.setAttribute('width',"100%");
     svg.setAttribute('height',"200");
+    svg.setAttribute('style', "display: inline-block");
     genderBlock.appendChild(svg);
 
     var config1 = liquidFillGaugeDefaultSettings();
@@ -38,8 +40,32 @@ function makeGenderElement(male, female){
     config1.waveTextColor = "#fff";
     config1.waveColor = "#3498DB";
     config1.circleThickness = 0.2;
-    config1.textVertPosition = 0.2;
     config1.waveAnimateTime = 1000;
 
-    var gendergauge = loadLiquidFillGauge("gendergauge", 100*male/(male+female), config1);
+    var percentage = loadLiquidFillGauge("gendergauge", 100*male/(male+female), config1);
+
+    var genderCol = document.getElementById("labelCol");
+    var cdiv = document.createElement("div");
+    cdiv.setAttribute('style','text-align: center');
+    genderCol.appendChild(cdiv);
+    var div = document.createElement("div");
+    div.setAttribute('id', 'genderLabel');
+    div.setAttribute('style', "display: inline-block;");
+    cdiv.appendChild(div)
+
+    var malelabel = document.createElement("span"); 
+    var divLabel = document.createElement("div");
+    divLabel.setAttribute('style', "height: 50px; width: 50px; margin: 20px 20px 20px 20px; float: center; border-radius: 50px; background: #3498DB; display: inline-block;");
+    malelabel.appendChild(divLabel);
+    var maletext = document.createTextNode(percentage[0]); 
+    malelabel.appendChild(maletext); 
+    div.appendChild(malelabel);
+
+    var femalelabel = document.createElement("span"); 
+    var fdivLabel = document.createElement("span");
+    fdivLabel.setAttribute('style', "height: 50px; width: 50px; margin: 20px 20px 20px 20px; float: center; border-radius: 50px; background: #e83e8c; display: inline-block;");
+    femalelabel.appendChild(fdivLabel);
+    var femaletext = document.createTextNode(percentage[1]); 
+    femalelabel.appendChild(femaletext); 
+    malelabel.appendChild(femalelabel);
 }

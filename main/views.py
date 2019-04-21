@@ -172,7 +172,10 @@ def get_latest(request):
 
 
 	else:
-		newest_date = latest_tweet_list[0].tweet_created_at.astimezone(pytz.utc)
+		if len(latest_tweet_list) > 0:
+			newest_date = latest_tweet_list[0].tweet_created_at.astimezone(pytz.utc)
+		else:
+			newest_date = oldest_date
 		minute_difference = (newest_date - oldest_date).total_seconds() / 60
 		minute = 0
 
