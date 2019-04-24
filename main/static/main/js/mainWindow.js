@@ -168,6 +168,11 @@ window.onload = function() {
             respondToTweet();
         }
     });
+    document.getElementById("map").addEventListener("click",function(e) {
+        if(e.target) {
+            getMapElement();
+        }
+    });
     setInterval(getWordCloud, 60000);
     getWordCloud();
     setInterval(getGenderElement, 60000);

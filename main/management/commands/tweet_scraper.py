@@ -33,12 +33,12 @@ class Command(BaseCommand):
 
 				if 'stolen' not in status.text and 'star' not in status.text and 'Star' not in status.text and 'Stolen' not in status.text:
 					try:
-						tw_created_at = status.created_at.astimezone(pytz.utc) 
+						tw_created_at = status.created_at
 						tw_year = tw_created_at.strftime("%Y")
 						tw_month = tw_created_at.strftime("%m")
 						tw_day = tw_created_at.strftime("%d")
 					except:
-						tw_created_at = datetime.now().astimezone(pytz.utc) 
+						tw_created_at = datetime.now()
 						tw_year = tw_created_at.strftime("%Y")
 						tw_month = tw_created_at.strftime("%m")
 						tw_day = tw_created_at.strftime("%d")

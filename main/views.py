@@ -45,12 +45,12 @@ def homepage(request):
 	year_score = []
 	year_time = []
 
-	one_day_ago = datetime.today().astimezone(central) - timedelta(days=1)
+	one_day_ago = datetime.now().astimezone(central) - timedelta(days=1)
 	tw_y = one_day_ago.strftime("%Y")
 	tw_m = one_day_ago.strftime("%m")
 	tw_d = one_day_ago.strftime("%d")
 	day_tweets = Tweet.objects.filter(tweet_day=tw_d, tweet_month=tw_m, tweet_year=tw_y).order_by('tweet_created_at')
-	while (one_day_ago.strftime("%d %m %H") != (datetime.today().astimezone(central).strftime("%d %m %H"))): 
+	while (one_day_ago.strftime("%d %m %H") != (datetime.now().astimezone(central).strftime("%d %m %H"))): 
 		score = 0
 		num = 0
 		for t in day_tweets:
@@ -59,12 +59,12 @@ def homepage(request):
 				num = num + 1
 		if num is 0:
 			day_score.append(0)
-			day_time.append(one_day_ago.strftime("%a %H:%M"))
+			day_time.append(one_day_ago.astimezone(central).strftime("%a %H:%M"))
 			one_day_ago = one_day_ago + timedelta(hours=1)
 		else:
 			avg = score / num
 			day_score.append(avg)
-			day_time.append(one_day_ago.strftime("%a %H:%M"))
+			day_time.append(one_day_ago.astimezone(central).strftime("%a %H:%M"))
 			one_day_ago = one_day_ago + timedelta(hours=1)
 
 	#week tweets
@@ -133,73 +133,21 @@ def homepage(request):
 #in java, use tie function to updata data , and rebuid the chart)
 
 def get_latest(request):
-	tw_created_at = datetime.today().astimezone(pytz.utc)
+	scores = []
+	times = []
+	tw_created_at = datetime.today().astimezone(central)
+	tw_later = datetime.today().astimezone(central) - timedelta(hours=4)
 	tw_year = tw_created_at.strftime("%Y")
 	tw_month = tw_created_at.strftime("%m")
 	tw_day = tw_created_at.strftime("%d")
-	latest_tweet_list = Tweet.objects.filter(tweet_day=tw_day, tweet_month=tw_month, tweet_year=tw_year).order_by('-tweet_created_at')
-	if len(latest_tweet_list) >= 100:
-		latest_tweet_list = latest_tweet_list[:100]
-	if len(latest_tweet_list) > 0:
-		oldest_date = latest_tweet_list[len(latest_tweet_list) - 1].tweet_created_at
-	else:
-		oldest_date = datetime.now().astimezone(pytz.utc)
-	now = datetime.now().astimezone(pytz.utc)
-	difference = int((now - oldest_date).total_seconds() / 60)
+	latest_tweet_list = Tweet.objects.filter(tweet_created_at__range=(tw_later, tw_created_at)).order_by('tweet_created_at')
+	print(latest_tweet_list)
+	if(len(latest_tweet_list) > 50):
+		latest_tweet_list = latest_tweet_list[:50]
 
-	## Granularity should be in hours or minutes
-	scores = []
-	times = []
-
-	if difference > 100:
-		hour = 0
-		while (hour < 24):
-			score_total = 0
-			num = 0
-			for tweet in latest_tweet_list:
-				hour_string = str(hour)
-				if hour < 10:
-					hour_string = "0" + hour_string
-				if hour_string == tweet.tweet_created_at.astimezone(central).strftime("%H"):
-					score_total += tweet.tweet_score
-					num += 1
-				else:
-					continue   
-			if num > 0:
-				scores.append(score_total / num)
-				times.append(str((hour % 12) + 1) + ":00")
-			hour += 1
-
-
-	else:
-		if len(latest_tweet_list) > 0:
-			newest_date = latest_tweet_list[0].tweet_created_at.astimezone(pytz.utc)
-		else:
-			newest_date = oldest_date
-		minute_difference = (newest_date - oldest_date).total_seconds() / 60
-		minute = 0
-
-		while (minute <= minute_difference):
-
-			score_total = 0
-			num = 0
-			for tweet in latest_tweet_list:
-				if int (((newest_date - tweet.tweet_created_at).total_seconds() / 60)) == minute:
-					score_total += tweet.tweet_score
-					num += 1
-				else:
-					continue
-			if num > 0:
-				scores.append(score_total / num)
-				#hour_string = str(round((int(oldest_date.astimezone(central).strftime("%H")) - minute) / 60))
-				hour_string = str(oldest_date.astimezone(central).strftime("%H"))
-				minute_string = str(round(minute % 60))
-				if len(minute_string) == 1:
-					minute_string = "0" + minute_string
-
-				times.append(hour_string + ":" + minute_string)
-			minute += 1
-
+	for t in latest_tweet_list:
+		scores.append(t.tweet_score)
+		times.append(t.tweet_created_at.astimezone(central).strftime("%a %H:%M"))
 
 	return_object = {}
 	return_object["scores"] = scores

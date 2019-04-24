@@ -36,7 +36,7 @@ function makeMap(locationData){
     var div = document.createElement("div");
     div.setAttribute('id','map');
     div.setAttribute('class',"d-flex w-100 justify-content-between");
-    div.setAttribute('style',"position: relative; width: 80%; max-height: 600px;");
+    div.setAttribute('style',"position: relative; width: 90%; max-height: 400px;");
     mapContainer.appendChild(div);
 
 	//basic map config with custom fills, mercator projection
@@ -45,7 +45,7 @@ function makeMap(locationData){
 		responsive: true,
 		element: document.getElementById('map'),
 		projection: 'mercator',
-		height: 500,
+		height: 400,
 		fills: {
 			defaultFill: '#F39C12',
 			gt50: '#3498DB',
