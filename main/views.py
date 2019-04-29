@@ -141,7 +141,6 @@ def get_latest(request):
 	tw_month = tw_created_at.strftime("%m")
 	tw_day = tw_created_at.strftime("%d")
 	latest_tweet_list = Tweet.objects.filter(tweet_created_at__range=(tw_later, tw_created_at)).order_by('tweet_created_at')
-	print(latest_tweet_list)
 	if(len(latest_tweet_list) > 50):
 		latest_tweet_list = latest_tweet_list[:50]
 
@@ -183,7 +182,6 @@ def get_latest_feed(request):
 	return HttpResponse(json.dumps(return_object), content_type='application/json')
 
 def send_tweet(request):
-	print("hi")
 	data=json.loads(request.body.decode("utf-8"))
 	print(data)
 	tweetID = data['tweetID']
